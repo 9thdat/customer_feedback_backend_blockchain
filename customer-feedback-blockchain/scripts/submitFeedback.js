@@ -510,27 +510,29 @@ const myPrivateKey = process.env.PRIVATE_KEY;
 const myAddress = "0x534F893b5758c284eB04F6d63Fe1f48036c35083";
 const recipientAddress = "0x5Da1D4F901b51Fee90cd64321B86C91Cdb00e96d";
 
-async function interact(name, email, message) {
+async function submitFeedback(name, email, message) {
     let web3 = new Web3("https://data-seed-prebsc-2-s1.binance.org:8545/");
     let floopyContract = new web3.eth.Contract(floopyAbi, floopyAddress);
 
-    // Call
-    let myBalance = await floopyContract.methods.balanceOf(myAddress).call();
-    console.log(myBalance);
-
-    //Send
     await web3.eth.accounts.wallet.add("0x" + myPrivateKey);
 
     let receiverBalanceBefore = await floopyContract.methods.balanceOf(recipientAddress).call();
 
-    let rs = await floopyContract.methods.transfer(recipientAddress, 100000).send({
+    // Assuming 'submitFeedback' is the name of the function in your smart contract
+    let rs = await floopyContract.methods.submitFeedback(name, email, message).send({
         from: myAddress,
         gasLimit: 500000,
         gasPrice: 10000000000
     });
 
+
     let receiverBalanceAfter = await floopyContract.methods.balanceOf(recipientAddress).call();
 
     console.log(rs, receiverBalanceBefore, receiverBalanceAfter);
+    // check the transaction is successful or not
+    return !!rs.status;
+
 }
-interact();
+
+module.exports = submitFeedback;
+
